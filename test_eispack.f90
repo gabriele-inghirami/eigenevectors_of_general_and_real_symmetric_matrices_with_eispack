@@ -3,7 +3,8 @@
 ! License: PUBLIC DOMAIN
 
 subroutine display(a, b, eva, eve)
-
+    
+    implicit none
     integer :: i, j
     integer, intent(in) :: a, b
     real(kind(1.0d0)), dimension(a), intent(in) :: eva
@@ -22,7 +23,8 @@ subroutine display(a, b, eva, eve)
 end subroutine
 
 program test
-
+    
+    implicit none
     integer, parameter :: n = 4, nm = n
     integer :: i, j, ierr
     real(kind(1.0d0)), dimension(n) :: w, fv1, fv2

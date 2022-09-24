@@ -15,7 +15,9 @@
 ! .....................................................................
 
 real(kind(1d0)) function pythag(a, b)
-real(kind(1d0)) :: a, b
+    
+    implicit none
+    real(kind(1d0)) :: a, b
 
 ! finds dsqrt(a**2+b**2) without overflow or destructive underflow
 
@@ -50,6 +52,7 @@ end function ! pythag
 
 subroutine rs(nm, n, a, w, z, fv1, fv2, ierr)
 
+    implicit none
     integer, parameter :: dp = kind(1.0d0)
     integer :: n, nm, ierr
     real(KIND=dp) :: a(nm,n), w(n), z(nm,n), fv1(n), fv2(n)
@@ -105,6 +108,7 @@ end subroutine ! rs
       
 subroutine tql2(nm, n, d, e, z, ierr)
 
+    implicit none
     integer, parameter :: dp = kind(1.0d0)
     integer :: i, j, k, l, m, n, ii, l1, l2, nm, mml, ierr
     real(KIND=dp) :: d(n), e(n), z(nm,n)
@@ -324,6 +328,7 @@ end subroutine ! tql2
 
 subroutine tred2(nm, n, a, d, e, z)
 
+    implicit none
     integer, parameter :: dp = kind(1.0d0)
     integer :: i, j, k, l, n, ii, nm, jp1
     real(KIND=dp) :: a(nm,n), d(n), e(n), z(nm,n)
