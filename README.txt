@@ -1,7 +1,8 @@
 ### eigenevectors_of_real_symmetric_matrices_with_eispack
+
 Fortran 90/95 adaptation of a couple of EISPACK Fortran 77 routines
 
-This micro library computes the eigenvalues and the eigenvectors of
+This (micro) library computes the eigenvalues and the eigenvectors of
 real symmetric matrices.
 
 These routines have been taken from https://netlib.org/eispack/ on Sept., 2022
@@ -17,11 +18,14 @@ The accompanying example code is released as PUBLIC DOMAIN, too.
 
 Each subroutine or function contains the description of its usage.
 
-To compile the library with gfortran (tested with gcc version 9.4.0):
-gfortran -c eispack_symm_matrix.f90
+To compile the (micro) library code with gfortran (tested with gcc version 9.4.0):
+gfortran -c eispack_real_symm_matrix.f90
+
+To create the (micro) library:
+ar r eispack_real_symm_matrix.a eispack_real_symm_matrix.o
 
 To compile the example program:
-gfortran test_eispack.f90 eispack.a -o test
+gfortran test_eispack.f90 eispack_real_symm_matrix.a -o test
 
 To execute the example program:
 ./test
