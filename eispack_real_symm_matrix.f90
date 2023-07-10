@@ -1,7 +1,9 @@
 ! This micro library computes the eigenvalues and the eigenvectors of
-! real symmetric matrices.
+! general and real symmetric matrices.
 !
 ! Each subroutine or function contains the description of its usage.
+!
+! This file contains the source code for the real symmetric case.
 !
 ! These routines have been taken from https://netlib.org/eispack/ on Sept., 2022
 ! and minimally modified by Gabriele Inghirami (g.inghirami a-T gsi.de) to adapt
