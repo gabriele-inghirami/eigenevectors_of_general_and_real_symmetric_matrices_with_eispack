@@ -1,4 +1,4 @@
-### eigenevectors_of_general_and_real_symmetric_matrices_with_eispack
+### eigenvectors_of_general_and_real_symmetric_matrices_with_eispack
 
 Fortran 90/95 adaptation of a couple of EISPACK Fortran 77 routines
 
