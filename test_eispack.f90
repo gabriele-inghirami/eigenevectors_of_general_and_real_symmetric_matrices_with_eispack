@@ -26,7 +26,7 @@ program test
     
     implicit none
     integer, parameter :: n = 4, nm = n
-    integer :: i, j, ierr
+    integer :: ierr
     real(kind(1.0d0)), dimension(n) :: w, fv1, fv2
     real(kind(1.0d0)), dimension(nm,n) :: a(nm,n), z(nm,n)
 
