@@ -17,11 +17,10 @@
 ! .....................................................................
 
       subroutine qzhes(nm,n,a,b,matz,z)
-      implicit none
 !
       integer i,j,k,l,n,lb,l1,nm,nk1,nm1,nm2
-      real(kind(1d0)) a(nm,n),b(nm,n),z(nm,n)
-      real(kind(1d0)) r,s,t,u1,u2,v1,v2,rho
+      real(kind(1.0d0)) a(nm,n),b(nm,n),z(nm,n)
+      real(kind(1.0d0)) r,s,t,u1,u2,v1,v2,rho
       logical matz
 !
 !     this subroutine is the first step of the qz algorithm
@@ -68,92 +67,91 @@
 !     ------------------------------------------------------------------
 !
 !     .......... initialize z ..........
-      if (.not. matz) go to 10
-!
-      do 3 j = 1, n
-!
-         do 2 i = 1, n
-            z(i,j) = 0.0d0
-    2    continue
-!
-         z(j,j) = 1.0d0
-    3 continue
+    if (matz) then
+        do j = 1, n
+            do i = 1, n
+                z(i,j) = 0.0d0
+            end do
+            z(j,j) = 1.0d0
+        end do
+    end if
+
 !     .......... reduce b to upper triangular form ..........
-   10 if (n .le. 1) go to 170
+    if (n .le. 1) goto 170
       nm1 = n - 1
 !
-      do 100 l = 1, nm1
+do l = 1, nm1 !do 100
          l1 = l + 1
          s = 0.0d0
 !
-         do 20 i = l1, n
+do i = l1, n !do 20
             s = s + dabs(b(i,l))
-   20    continue
+            end do !20    continue
 !
-         if (s .eq. 0.0d0) go to 100
+         if (s .eq. 0.0d0) cycle !goto 100
          s = s + dabs(b(l,l))
          r = 0.0d0
 !
-         do 25 i = l, n
+do i = l, n !do 25
             b(i,l) = b(i,l) / s
             r = r + b(i,l)**2
-   25    continue
+        end do !25    continue
 !
          r = dsign(dsqrt(r),b(l,l))
          b(l,l) = b(l,l) + r
          rho = r * b(l,l)
 !
-         do 50 j = l1, n
+do j = l1, n !do 50
             t = 0.0d0
 !
-            do 30 i = l, n
+do i = l, n !do 30
                t = t + b(i,l) * b(i,j)
-   30       continue
+               end do !30       continue
 !
             t = -t / rho
 !
-            do 40 i = l, n
+do i = l, n !do 40
                b(i,j) = b(i,j) + t * b(i,l)
-   40       continue
+               end do !40       continue
 !
-   50    continue
+end do !50    continue
 !
-         do 80 j = 1, n
+do j = 1, n !do 80
             t = 0.0d0
 !
-            do 60 i = l, n
+do i = l, n !do 60
                t = t + b(i,l) * a(i,j)
-   60       continue
+           end do !60       continue
 !
             t = -t / rho
 !
-            do 70 i = l, n
+do i = l, n !do 70
                a(i,j) = a(i,j) + t * b(i,l)
-   70       continue
+               end do !70       continue
 !
-   80    continue
+end do !80    continue
 !
          b(l,l) = -s * r
 !
-         do 90 i = l1, n
+do i = l1, n !do 90
             b(i,l) = 0.0d0
-   90    continue
+            end do !90    continue
 !
-  100 continue
+end do !100 continue
 !     .......... reduce a to upper hessenberg form, while
 !                keeping b triangular ..........
-      if (n .eq. 2) go to 170
+      if (n .eq. 2) goto 170
       nm2 = n - 2
 !
-      do 160 k = 1, nm2
+do k = 1, nm2 !do 160
          nk1 = nm1 - k
 !     .......... for l=n-1 step -1 until k+1 do -- ..........
-         do 150 lb = 1, nk1
+do lb = 1, nk1 !do 150
             l = n - lb
             l1 = l + 1
 !     .......... zero a(l+1,k) ..........
             s = dabs(a(l,k)) + dabs(a(l1,k))
-            if (s .eq. 0.0d0) go to 150
+            if (s .eq. 0.0d0) cycle !goto 150
             u1 = a(l,k) / s
             u2 = a(l1,k) / s
             r = dsign(dsqrt(u1*u1+u2*u2),u1)
@@ -161,22 +159,22 @@
             v2 = -u2 / r
             u2 = v2 / v1
 !
-            do 110 j = k, n
+do j = k, n !do 110
                t = a(l,j) + u2 * a(l1,j)
                a(l,j) = a(l,j) + t * v1
                a(l1,j) = a(l1,j) + t * v2
-  110       continue
+               end do !110       continue
 !
             a(l1,k) = 0.0d0
 !
-            do 120 j = l, n
+do j = l, n !do 120
                t = b(l,j) + u2 * b(l1,j)
                b(l,j) = b(l,j) + t * v1
                b(l1,j) = b(l1,j) + t * v2
-  120       continue
+               end do !120       continue
 !     .......... zero b(l+1,l) ..........
             s = dabs(b(l1,l1)) + dabs(b(l1,l))
-            if (s .eq. 0.0d0) go to 150
+            if (s .eq. 0.0d0) cycle !goto 150
             u1 = b(l1,l1) / s
             u2 = b(l1,l) / s
             r = dsign(dsqrt(u1*u1+u2*u2),u1)
@@ -184,42 +182,43 @@
             v2 = -u2 / r
             u2 = v2 / v1
 !
-            do 130 i = 1, l1
+do i = 1, l1 !do 130
                t = b(i,l1) + u2 * b(i,l)
                b(i,l1) = b(i,l1) + t * v1
                b(i,l) = b(i,l) + t * v2
-  130       continue
+           end do !  130       continue
 !
             b(l1,l) = 0.0d0
 !
-            do 140 i = 1, n
+do i = 1, n !do 140
                t = a(i,l1) + u2 * a(i,l)
                a(i,l1) = a(i,l1) + t * v1
                a(i,l) = a(i,l) + t * v2
-  140       continue
+               end do !140       continue
 !
-            if (.not. matz) go to 150
+            if (.not. matz) cycle !goto 150
 !
-            do 145 i = 1, n
+do i = 1, n !do 145
                t = z(i,l1) + u2 * z(i,l)
                z(i,l1) = z(i,l1) + t * v1
                z(i,l) = z(i,l) + t * v2
-  145       continue
+           end do !  145       continue
 !
-  150    continue
+end do !150    continue
 !
-  160 continue
+end do !160 continue
 !
   170 return
-      end
+      end subroutine
+
       subroutine qzit(nm,n,a,b,eps1,matz,z,ierr)
 !
-      integer i,j,k,l,n,en,k1,k2,ld,ll,l1,na,nm,ish,itn,its,km1,lm1,
-     x        enm2,ierr,lor1,enorn
-      real(kind(1d0)) a(nm,n),b(nm,n),z(nm,n)
-      real(kind(1d0)) r,s,t,a1,a2,a3,ep,sh,u1,u2,u3,v1,v2,v3,ani,a11,
-     x       a12,a21,a22,a33,a34,a43,a44,bni,b11,b12,b22,b33,b34,
-     x       b44,epsa,epsb,eps1,anorm,bnorm,epslon
+      integer i,j,k,l,n,en,k1,k2,ld,ll,l1,na,nm,ish,itn,its,km1,lm1
+      integer enm2,ierr,lor1,enorn
+      real(kind(1.0d0)) a(nm,n),b(nm,n),z(nm,n)
+      real(kind(1.0d0)) r,s,t,a1,a2,a3,ep,sh,u1,u2,u3,v1,v2,v3,ani,a11
+      real(kind(1.0d0)) a12,a21,a22,a33,a34,a43,a44,bni,b11,b12,b22,b33,b34
+      real(kind(1.0d0)) b44,epsa,epsb,eps1,anorm,bnorm
       logical matz,notlas
 !
 !     this subroutine is the second step of the qz algorithm
@@ -294,24 +293,24 @@
       anorm = 0.0d0
       bnorm = 0.0d0
 !
-      do 30 i = 1, n
+do i = 1, n !do 30
          ani = 0.0d0
          if (i .ne. 1) ani = dabs(a(i,i-1))
          bni = 0.0d0
 !
-         do 20 j = i, n
+do j = i, n !do 20
             ani = ani + dabs(a(i,j))
             bni = bni + dabs(b(i,j))
-   20    continue
+            end do  !20    continue
 !
          if (ani .gt. anorm) anorm = ani
          if (bni .gt. bnorm) bnorm = bni
-   30 continue
+     end do !30 continue
 !
       if (anorm .eq. 0.0d0) anorm = 1.0d0
       if (bnorm .eq. 0.0d0) bnorm = 1.0d0
       ep = eps1
-      if (ep .gt. 0.0d0) go to 50
+      if (ep .gt. 0.0d0) goto 50
 !     .......... use roundoff level if eps1 is zero ..........
       ep = epsilon(1.0d0)
    50 epsa = ep * anorm
@@ -323,7 +322,7 @@
       en = n
       itn = 30*n
 !     .......... begin qz step ..........
-   60 if (en .le. 2) go to 1001
+   60 if (en .le. 2) goto 1001
       if (.not. matz) enorn = en
       its = 0
       na = en - 1
@@ -331,23 +330,23 @@
    70 ish = 2
 !     .......... check for convergence or reducibility.
 !                for l=en step -1 until 1 do -- ..........
-      do 80 ll = 1, en
+do ll = 1, en !do 80
          lm1 = en - ll
          l = lm1 + 1
-         if (l .eq. 1) go to 95
-         if (dabs(a(l,lm1)) .le. epsa) go to 90
-   80 continue
+         if (l .eq. 1) goto 95
+         if (dabs(a(l,lm1)) .le. epsa) goto 90
+         end do !80 continue
 !
    90 a(l,lm1) = 0.0d0
-      if (l .lt. na) go to 95
+      if (l .lt. na) goto 95
 !     .......... 1-by-1 or 2-by-2 block isolated ..........
       en = lm1
-      go to 60
+      goto 60
 !     .......... check for small top of b ..........
    95 ld = l
   100 l1 = l + 1
       b11 = b(l,l)
-      if (dabs(b11) .gt. epsb) go to 120
+      if (dabs(b11) .gt. epsb) goto 120
       b(l,l) = 0.0d0
       s = dabs(a(l,l)) + dabs(a(l1,l))
       u1 = a(l,l) / s
@@ -357,25 +356,25 @@
       v2 = -u2 / r
       u2 = v2 / v1
 !
-      do 110 j = l, enorn
+do j = l, enorn !do 110
          t = a(l,j) + u2 * a(l1,j)
          a(l,j) = a(l,j) + t * v1
          a(l1,j) = a(l1,j) + t * v2
          t = b(l,j) + u2 * b(l1,j)
          b(l,j) = b(l,j) + t * v1
          b(l1,j) = b(l1,j) + t * v2
-  110 continue
+         end do !110 continue
 !
       if (l .ne. 1) a(l,lm1) = -a(l,lm1)
       lm1 = l
       l = l1
-      go to 90
+      goto 90
   120 a11 = a(l,l) / b11
       a21 = a(l1,l) / b11
-      if (ish .eq. 1) go to 140
+      if (ish .eq. 1) goto 140
 !     .......... iteration strategy ..........
-      if (itn .eq. 0) go to 1000
-      if (its .eq. 10) go to 155
+      if (itn .eq. 0) goto 1000
+      if (its .eq. 10) goto 155
 !     .......... determine type of shift ..........
       b22 = b(l1,l1)
       if (dabs(b22) .lt. epsb) b22 = epsb
@@ -390,7 +389,7 @@
       b34 = b(na,en) / b44
       t = 0.5d0 * (a43 * b34 - a33 - a44)
       r = t * t + a34 * a43 - a33 * a44
-      if (r .lt. 0.0d0) go to 150
+      if (r .lt. 0.0d0) goto 150
 !     .......... determine single shift zeroth column of a ..........
       ish = 1
       r = dsqrt(r)
@@ -400,30 +399,29 @@
 !     .......... look for two consecutive small
 !                sub-diagonal elements of a.
 !                for l=en-2 step -1 until ld do -- ..........
-      do 130 ll = ld, enm2
+do ll = ld, enm2 !do 130
          l = enm2 + ld - ll
-         if (l .eq. ld) go to 140
+         if (l .eq. ld) goto 140
          lm1 = l - 1
          l1 = l + 1
          t = a(l,l)
          if (dabs(b(l,l)) .gt. epsb) t = t - sh * b(l,l)
-         if (dabs(a(l,lm1)) .le. dabs(t/a(l1,l)) * epsa) go to 100
-  130 continue
+         if (dabs(a(l,lm1)) .le. dabs(t/a(l1,l)) * epsa) goto 100
+     end do !130 continue
 !
   140 a1 = a11 - sh
       a2 = a21
       if (l .ne. ld) a(l,lm1) = -a(l,lm1)
-      go to 160
-!     .......... determine real(kind(1d0)) shift zeroth column of a ..........
+      goto 160
+!     .......... determine double shift zeroth column of a ..........
   150 a12 = a(l,l1) / b22
       a22 = a(l1,l1) / b22
       b12 = b(l,l1) / b22
-      a1 = ((a33 - a11) * (a44 - a11) - a34 * a43 + a43 * b34 * a11)
-     x     / a21 + a12 - a11 * b12
-      a2 = (a22 - a11) - a21 * b12 - (a33 - a11) - (a44 - a11)
-     x     + a43 * b34
+      a1 = ((a33 - a11) * (a44 - a11) - a34 * a43 + a43 * b34 * a11) /&
+           a21 + a12 - a11 * b12
+      a2 = (a22 - a11) - a21 * b12 - (a33 - a11) - (a44 - a11) + a43 * b34
       a3 = a(l1+1,l1) / b22
-      go to 160
+      goto 160
 !     .......... ad hoc shift ..........
   155 a1 = 0.0d0
       a2 = 1.0d0
@@ -432,19 +430,19 @@
       itn = itn - 1
       if (.not. matz) lor1 = ld
 !     .......... main loop ..........
-      do 260 k = l, na
+do k = l, na !do 260
          notlas = k .ne. na .and. ish .eq. 2
          k1 = k + 1
          k2 = k + 2
          km1 = max0(k-1,l)
          ll = min0(en,k1+ish)
-         if (notlas) go to 190
+         if (notlas) goto 190
 !     .......... zero a(k+1,k-1) ..........
-         if (k .eq. l) go to 170
+         if (k .eq. l) goto 170
          a1 = a(k,km1)
          a2 = a(k1,km1)
   170    s = dabs(a1) + dabs(a2)
-         if (s .eq. 0.0d0) go to 70
+         if (s .eq. 0.0d0) goto 70
          u1 = a1 / s
          u2 = a2 / s
          r = dsign(dsqrt(u1*u1+u2*u2),u1)
@@ -452,24 +450,24 @@
          v2 = -u2 / r
          u2 = v2 / v1
 !
-         do 180 j = km1, enorn
+do j = km1, enorn !do 180
             t = a(k,j) + u2 * a(k1,j)
             a(k,j) = a(k,j) + t * v1
             a(k1,j) = a(k1,j) + t * v2
             t = b(k,j) + u2 * b(k1,j)
             b(k,j) = b(k,j) + t * v1
             b(k1,j) = b(k1,j) + t * v2
-  180    continue
+            end do !180    continue
 !
          if (k .ne. l) a(k1,km1) = 0.0d0
-         go to 240
+         goto 240
 !     .......... zero a(k+1,k-1) and a(k+2,k-1) ..........
-  190    if (k .eq. l) go to 200
+  190    if (k .eq. l) goto 200
          a1 = a(k,km1)
          a2 = a(k1,km1)
          a3 = a(k2,km1)
   200    s = dabs(a1) + dabs(a2) + dabs(a3)
-         if (s .eq. 0.0d0) go to 260
+         if (s .eq. 0.0d0) cycle !goto 260
          u1 = a1 / s
          u2 = a2 / s
          u3 = a3 / s
@@ -480,7 +478,7 @@
          u2 = v2 / v1
          u3 = v3 / v1
 !
-         do 210 j = km1, enorn
+do j = km1, enorn !do 210
             t = a(k,j) + u2 * a(k1,j) + u3 * a(k2,j)
             a(k,j) = a(k,j) + t * v1
             a(k1,j) = a(k1,j) + t * v2
@@ -489,14 +487,14 @@
             b(k,j) = b(k,j) + t * v1
             b(k1,j) = b(k1,j) + t * v2
             b(k2,j) = b(k2,j) + t * v3
-  210    continue
+            end do !210    continue
 !
-         if (k .eq. l) go to 220
+         if (k .eq. l) goto 220
          a(k1,km1) = 0.0d0
          a(k2,km1) = 0.0d0
 !     .......... zero b(k+2,k+1) and b(k+2,k) ..........
   220    s = dabs(b(k2,k2)) + dabs(b(k2,k1)) + dabs(b(k2,k))
-         if (s .eq. 0.0d0) go to 240
+         if (s .eq. 0.0d0) goto 240
          u1 = b(k2,k2) / s
          u2 = b(k2,k1) / s
          u3 = b(k2,k) / s
@@ -507,7 +505,7 @@
          u2 = v2 / v1
          u3 = v3 / v1
 !
-         do 230 i = lor1, ll
+do i = lor1, ll !do 230
             t = a(i,k2) + u2 * a(i,k1) + u3 * a(i,k)
             a(i,k2) = a(i,k2) + t * v1
             a(i,k1) = a(i,k1) + t * v2
@@ -516,21 +514,21 @@
             b(i,k2) = b(i,k2) + t * v1
             b(i,k1) = b(i,k1) + t * v2
             b(i,k) = b(i,k) + t * v3
-  230    continue
+            end do !230    continue
 !
          b(k2,k) = 0.0d0
          b(k2,k1) = 0.0d0
-         if (.not. matz) go to 240
+         if (.not. matz) goto 240
 !
-         do 235 i = 1, n
+do i = 1, n !do 235
             t = z(i,k2) + u2 * z(i,k1) + u3 * z(i,k)
             z(i,k2) = z(i,k2) + t * v1
             z(i,k1) = z(i,k1) + t * v2
             z(i,k) = z(i,k) + t * v3
-  235    continue
+            end do !235    continue
 !     .......... zero b(k+1,k) ..........
   240    s = dabs(b(k1,k1)) + dabs(b(k1,k))
-         if (s .eq. 0.0d0) go to 260
+         if (s .eq. 0.0d0) cycle !goto 260
          u1 = b(k1,k1) / s
          u2 = b(k1,k) / s
          r = dsign(dsqrt(u1*u1+u2*u2),u1)
@@ -538,27 +536,27 @@
          v2 = -u2 / r
          u2 = v2 / v1
 !
-         do 250 i = lor1, ll
+do i = lor1, ll !do 250
             t = a(i,k1) + u2 * a(i,k)
             a(i,k1) = a(i,k1) + t * v1
             a(i,k) = a(i,k) + t * v2
             t = b(i,k1) + u2 * b(i,k)
             b(i,k1) = b(i,k1) + t * v1
             b(i,k) = b(i,k) + t * v2
-  250    continue
+            end do !250    continue
 !
          b(k1,k) = 0.0d0
-         if (.not. matz) go to 260
+         if (.not. matz) cycle !goto 260
 !
-         do 255 i = 1, n
+do i = 1, n !do 255
             t = z(i,k1) + u2 * z(i,k)
             z(i,k1) = z(i,k1) + t * v1
             z(i,k) = z(i,k) + t * v2
-  255    continue
+            end do !255    continue
 !
-  260 continue
+end do !260 continue
 !     .......... end qz step ..........
-      go to 70
+      goto 70
 !     .......... set error -- all eigenvalues have not
 !                converged after 30*n iterations ..........
  1000 ierr = en
@@ -566,13 +564,14 @@
  1001 if (n .gt. 1) b(n,1) = epsb
       return
       end
+
       subroutine qzval(nm,n,a,b,alfr,alfi,beta,matz,z)
 !
       integer i,j,n,en,na,nm,nn,isw
-      real(kind(1d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
-      real(kind(1d0)) c,d,e,r,s,t,an,a1,a2,bn,cq,cz,di,dr,ei,ti,tr,u1,
-     x       u2,v1,v2,a1i,a11,a12,a2i,a21,a22,b11,b12,b22,sqi,sqr,
-     x       ssi,ssr,szi,szr,a11i,a11r,a12i,a12r,a22i,a22r,epsb
+      real(kind(1.0d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
+      real(kind(1.0d0)) c,d,e,r,s,t,an,a1,a2,bn,cq,cz,di,dr,ei,ti,tr,u1
+      real(kind(1.0d0)) u2,v1,v2,a1i,a11,a12,a2i,a21,a22,b11,b12,b22,sqi,sqr
+      real(kind(1.0d0)) ssi,ssr,szi,szr,a11i,a11r,a12i,a12r,a22i,a22r,epsb
       logical matz
 !
 !     this subroutine is the third step of the qz algorithm
@@ -643,27 +642,26 @@
       isw = 1
 !     .......... find eigenvalues of quasi-triangular matrices.
 !                for en=n step -1 until 1 do -- ..........
-      do 510 nn = 1, n
+do nn = 1, n !do 510
          en = n + 1 - nn
          na = en - 1
-         if (isw .eq. 2) go to 505
-         if (en .eq. 1) go to 410
-         if (a(en,na) .ne. 0.0d0) go to 420
+         if (isw .eq. 2) goto 505
+         if (en .eq. 1) goto 410
+         if (a(en,na) .ne. 0.0d0) goto 420
 !     .......... 1-by-1 block, one real root ..........
   410    alfr(en) = a(en,en)
          if (b(en,en) .lt. 0.0d0) alfr(en) = -alfr(en)
          beta(en) = dabs(b(en,en))
          alfi(en) = 0.0d0
-         go to 510
+         cycle !goto 510
 !     .......... 2-by-2 block ..........
-  420    if (dabs(b(na,na)) .le. epsb) go to 455
-         if (dabs(b(en,en)) .gt. epsb) go to 430
+  420    if (dabs(b(na,na)) .le. epsb) goto 455
+         if (dabs(b(en,en)) .gt. epsb) goto 430
          a1 = a(en,en)
          a2 = a(en,na)
          bn = 0.0d0
-         go to 435
-  430    an = dabs(a(na,na)) + dabs(a(na,en)) + dabs(a(en,na))
-     x      + dabs(a(en,en))
+         goto 435
+  430    an = dabs(a(na,na)) + dabs(a(na,en)) + dabs(a(en,na)) + dabs(a(en,en))
          bn = dabs(b(na,na)) + dabs(b(na,en)) + dabs(b(en,en))
          a11 = a(na,na) / an
          a12 = a(na,en) / an
@@ -676,23 +674,22 @@
          ei = a22 / b22
          s = a21 / (b11 * b22)
          t = (a22 - e * b22) / b22
-         if (dabs(e) .le. dabs(ei)) go to 431
+         if (dabs(e) .le. dabs(ei)) goto 431
          e = ei
          t = (a11 - e * b11) / b11
   431    c = 0.5d0 * (t - s * b12)
          d = c * c + s * (a12 - e * b12)
-         if (d .lt. 0.0d0) go to 480
+         if (d .lt. 0.0d0) goto 480
 !     .......... two real roots.
 !                zero both a(en,na) and b(en,na) ..........
          e = e + (c + dsign(dsqrt(d),c))
          a11 = a11 - e * b11
          a12 = a12 - e * b12
          a22 = a22 - e * b22
-         if (dabs(a11) + dabs(a12) .lt.
-     x       dabs(a21) + dabs(a22)) go to 432
+         if (dabs(a11) + dabs(a12) .lt. dabs(a21) + dabs(a22)) goto 432
          a1 = a12
          a2 = a11
-         go to 435
+         goto 435
   432    a1 = a22
          a2 = a21
 !     .......... choose and apply real z ..........
@@ -704,33 +701,33 @@
          v2 = -u2 / r
          u2 = v2 / v1
 !
-         do 440 i = 1, en
+do i = 1, en !do 440
             t = a(i,en) + u2 * a(i,na)
             a(i,en) = a(i,en) + t * v1
             a(i,na) = a(i,na) + t * v2
             t = b(i,en) + u2 * b(i,na)
             b(i,en) = b(i,en) + t * v1
             b(i,na) = b(i,na) + t * v2
-  440    continue
+            end do !440    continue
 !
-         if (.not. matz) go to 450
+         if (.not. matz) goto 450
 !
-         do 445 i = 1, n
+do i = 1, n !do 445
             t = z(i,en) + u2 * z(i,na)
             z(i,en) = z(i,en) + t * v1
             z(i,na) = z(i,na) + t * v2
-  445    continue
+            end do !445    continue
 !
-  450    if (bn .eq. 0.0d0) go to 475
-         if (an .lt. dabs(e) * bn) go to 455
+  450    if (bn .eq. 0.0d0) goto 475
+         if (an .lt. dabs(e) * bn) goto 455
          a1 = b(na,na)
          a2 = b(en,na)
-         go to 460
+         goto 460
   455    a1 = a(na,na)
          a2 = a(en,na)
 !     .......... choose and apply real q ..........
   460    s = dabs(a1) + dabs(a2)
-         if (s .eq. 0.0d0) go to 475
+         if (s .eq. 0.0d0) goto 475
          u1 = a1 / s
          u2 = a2 / s
          r = dsign(dsqrt(u1*u1+u2*u2),u1)
@@ -738,14 +735,14 @@
          v2 = -u2 / r
          u2 = v2 / v1
 !
-         do 470 j = na, n
+do j = na, n !do 470
             t = a(na,j) + u2 * a(en,j)
             a(na,j) = a(na,j) + t * v1
             a(en,j) = a(en,j) + t * v2
             t = b(na,j) + u2 * b(en,j)
             b(na,j) = b(na,j) + t * v1
             b(en,j) = b(en,j) + t * v2
-  470    continue
+            end do !470    continue
 !
   475    a(en,na) = 0.0d0
          b(en,na) = 0.0d0
@@ -757,7 +754,7 @@
          beta(en) = dabs(b(en,en))
          alfi(en) = 0.0d0
          alfi(na) = 0.0d0
-         go to 505
+         goto 505
 !     .......... two complex roots ..........
   480    e = e + c
          ei = dsqrt(-d)
@@ -767,49 +764,49 @@
          a12i = ei * b12
          a22r = a22 - e * b22
          a22i = ei * b22
-         if (dabs(a11r) + dabs(a11i) + dabs(a12r) + dabs(a12i) .lt.
-     x       dabs(a21) + dabs(a22r) + dabs(a22i)) go to 482
+         if (dabs(a11r) + dabs(a11i) + dabs(a12r) + dabs(a12i) .lt.&
+            dabs(a21) + dabs(a22r) + dabs(a22i)) goto 482
          a1 = a12r
          a1i = a12i
          a2 = -a11r
          a2i = -a11i
-         go to 485
+         goto 485
   482    a1 = a22r
          a1i = a22i
          a2 = -a21
          a2i = 0.0d0
 !     .......... choose complex z ..........
   485    cz = dsqrt(a1*a1+a1i*a1i)
-         if (cz .eq. 0.0d0) go to 487
+         if (cz .eq. 0.0d0) goto 487
          szr = (a1 * a2 + a1i * a2i) / cz
          szi = (a1 * a2i - a1i * a2) / cz
          r = dsqrt(cz*cz+szr*szr+szi*szi)
          cz = cz / r
          szr = szr / r
          szi = szi / r
-         go to 490
+         goto 490
   487    szr = 1.0d0
          szi = 0.0d0
-  490    if (an .lt. (dabs(e) + ei) * bn) go to 492
+  490    if (an .lt. (dabs(e) + ei) * bn) goto 492
          a1 = cz * b11 + szr * b12
          a1i = szi * b12
          a2 = szr * b22
          a2i = szi * b22
-         go to 495
+         goto 495
   492    a1 = cz * a11 + szr * a12
          a1i = szi * a12
          a2 = cz * a21 + szr * a22
          a2i = szi * a22
 !     .......... choose complex q ..........
   495    cq = dsqrt(a1*a1+a1i*a1i)
-         if (cq .eq. 0.0d0) go to 497
+         if (cq .eq. 0.0d0) goto 497
          sqr = (a1 * a2 + a1i * a2i) / cq
          sqi = (a1 * a2i - a1i * a2) / cq
          r = dsqrt(cq*cq+sqr*sqr+sqi*sqi)
          cq = cq / r
          sqr = sqr / r
          sqi = sqi / r
-         go to 500
+         goto 500
   497    sqr = 1.0d0
          sqi = 0.0d0
 !     .......... compute diagonal elements that would result
@@ -817,15 +814,13 @@
   500    ssr = sqr * szr + sqi * szi
          ssi = sqr * szi - sqi * szr
          i = 1
-         tr = cq * cz * a11 + cq * szr * a12 + sqr * cz * a21
-     x      + ssr * a22
+         tr = cq * cz * a11 + cq * szr * a12 + sqr * cz * a21 + ssr * a22
          ti = cq * szi * a12 - sqi * cz * a21 + ssi * a22
          dr = cq * cz * b11 + cq * szr * b12 + ssr * b22
          di = cq * szi * b12 + ssi * b22
-         go to 503
+         goto 503
   502    i = 2
-         tr = ssr * a11 - sqr * cz * a12 - cq * szr * a21
-     x      + cq * cz * a22
+         tr = ssr * a11 - sqr * cz * a12 - cq * szr * a21 + cq * cz * a22
          ti = -ssi * a11 - sqi * cz * a12 + cq * szi * a21
          dr = ssr * b11 - sqr * cz * b12 + cq * cz * b22
          di = -ssi * b11 - sqi * cz * b12
@@ -836,19 +831,20 @@
          beta(j) = bn * r
          alfr(j) = an * (tr * dr + ti * di) / r
          alfi(j) = an * t / r
-         if (i .eq. 1) go to 502
+         if (i .eq. 1) goto 502
   505    isw = 3 - isw
-  510 continue
+  end do !510 continue
       b(n,1) = epsb
 !
       return
       end
+
       subroutine qzvec(nm,n,a,b,alfr,alfi,beta,z)
 !
       integer i,j,k,m,n,en,ii,jj,na,nm,nn,isw,enm2
-      real(kind(1d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
-      real(kind(1d0)) d,q,r,s,t,w,x,y,di,dr,ra,rr,sa,ti,tr,t1,t2,w1,x1,
-     x       zz,z1,alfm,almi,almr,betm,epsb
+      real(kind(1.0d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
+      real(kind(1.0d0)) d,q,r,s,t,w,x,y,di,dr,ra,rr,sa,ti,tr,t1,t2,w1,x1
+      real(kind(1.0d0)) zz,z1,alfm,almi,almr,betm,epsb
 !
 !     this subroutine is the optional fourth step of the qz algorithm
 !     for solving generalized matrix eigenvalue problems,
@@ -916,52 +912,53 @@
       epsb = b(n,1)
       isw = 1
 !     .......... for en=n step -1 until 1 do -- ..........
-      do 800 nn = 1, n
+do nn = 1, n !do 800
          en = n + 1 - nn
          na = en - 1
-         if (isw .eq. 2) go to 795
-         if (alfi(en) .ne. 0.0d0) go to 710
+         if (isw .eq. 2) goto 795
+         if (alfi(en) .ne. 0.0d0) goto 710
 !     .......... real vector ..........
          m = en
          b(en,en) = 1.0d0
-         if (na .eq. 0) go to 800
+         if (na .eq. 0) cycle !goto 800
          alfm = alfr(m)
          betm = beta(m)
 !     .......... for i=en-1 step -1 until 1 do -- ..........
-         do 700 ii = 1, na
+do ii = 1, na !do 700
             i = en - ii
             w = betm * a(i,i) - alfm * b(i,i)
             r = 0.0d0
 !
-            do 610 j = m, en
-  610       r = r + (betm * a(i,j) - alfm * b(i,j)) * b(j,en)
+do j = m, en !do 610
+        r = r + (betm * a(i,j) - alfm * b(i,j)) * b(j,en)
+    end do !610
 !
-            if (i .eq. 1 .or. isw .eq. 2) go to 630
-            if (betm * a(i,i-1) .eq. 0.0d0) go to 630
+            if (i .eq. 1 .or. isw .eq. 2) goto 630
+            if (betm * a(i,i-1) .eq. 0.0d0) goto 630
             zz = w
             s = r
-            go to 690
+            goto 690
   630       m = i
-            if (isw .eq. 2) go to 640
+            if (isw .eq. 2) goto 640
 !     .......... real 1-by-1 block ..........
             t = w
             if (w .eq. 0.0d0) t = epsb
             b(i,en) = -r / t
-            go to 700
+            cycle !goto 700
 !     .......... real 2-by-2 block ..........
   640       x = betm * a(i,i+1) - alfm * b(i,i+1)
             y = betm * a(i+1,i)
             q = w * zz - x * y
             t = (x * s - zz * r) / q
             b(i,en) = t
-            if (dabs(x) .le. dabs(zz)) go to 650
+            if (dabs(x) .le. dabs(zz)) goto 650
             b(i+1,en) = (-r - w * t) / x
-            go to 690
+            goto 690
   650       b(i+1,en) = (-s - y * t) / zz
   690       isw = 3 - isw
-  700    continue
+  end do !700    continue
 !     .......... end real vector ..........
-         go to 800
+         cycle !goto 800
 !     .......... complex vector ..........
   710    m = na
          almr = alfr(m)
@@ -975,49 +972,53 @@
          b(en,na) = 0.0d0
          b(en,en) = 1.0d0
          enm2 = na - 1
-         if (enm2 .eq. 0) go to 795
+         if (enm2 .eq. 0) goto 795
 !     .......... for i=en-2 step -1 until 1 do -- ..........
-         do 790 ii = 1, enm2
+do ii = 1, enm2 !do 790
             i = na - ii
             w = betm * a(i,i) - almr * b(i,i)
             w1 = -almi * b(i,i)
             ra = 0.0d0
             sa = 0.0d0
 !
-            do 760 j = m, en
+do j = m, en !do 760
                x = betm * a(i,j) - almr * b(i,j)
                x1 = -almi * b(i,j)
                ra = ra + x * b(j,na) - x1 * b(j,en)
                sa = sa + x * b(j,en) + x1 * b(j,na)
-  760       continue
+               end do !760       continue
 !
-            if (i .eq. 1 .or. isw .eq. 2) go to 770
-            if (betm * a(i,i-1) .eq. 0.0d0) go to 770
+            if (i .eq. 1 .or. isw .eq. 2) goto 770
+            if (betm * a(i,i-1) .eq. 0.0d0) goto 770
             zz = w
             z1 = w1
             r = ra
             s = sa
             isw = 2
-            go to 790
+            cycle !goto 790
   770       m = i
-            if (isw .eq. 2) go to 780
+            if (isw .eq. 2) goto 780
 !     .......... complex 1-by-1 block ..........
             tr = -ra
             ti = -sa
   773       dr = w
             di = w1
 !     .......... complex divide (t1,t2) = (tr,ti) / (dr,di) ..........
-  775       if (dabs(di) .gt. dabs(dr)) go to 777
+  775       if (dabs(di) .gt. dabs(dr)) goto 777
             rr = di / dr
             d = dr + di * rr
             t1 = (tr + ti * rr) / d
             t2 = (ti - tr * rr) / d
-            go to (787,782), isw
+            !goto (787,782), isw
+            if (isw .eq. 1) goto 787
+            if (isw .eq. 2) goto 782
   777       rr = dr / di
             d = dr * rr + di
             t1 = (tr * rr + ti) / d
             t2 = (ti * rr - tr) / d
-            go to (787,782), isw
+            !goto (787,782), isw
+            if (isw .eq. 1) goto 787
+            if (isw .eq. 2) goto 782
 !     .......... complex 2-by-2 block ..........
   780       x = betm * a(i,i+1) - almr * b(i,i+1)
             x1 = -almi * b(i,i+1)
@@ -1027,74 +1028,78 @@
             dr = w * zz - w1 * z1 - x * y
             di = w * z1 + w1 * zz - x1 * y
             if (dr .eq. 0.0d0 .and. di .eq. 0.0d0) dr = epsb
-            go to 775
+            goto 775
   782       b(i+1,na) = t1
             b(i+1,en) = t2
             isw = 1
-            if (dabs(y) .gt. dabs(w) + dabs(w1)) go to 785
+            if (dabs(y) .gt. dabs(w) + dabs(w1)) goto 785
             tr = -ra - x * b(i+1,na) + x1 * b(i+1,en)
             ti = -sa - x * b(i+1,en) - x1 * b(i+1,na)
-            go to 773
+            goto 773
   785       t1 = (-r - zz * b(i+1,na) + z1 * b(i+1,en)) / y
             t2 = (-s - zz * b(i+1,en) - z1 * b(i+1,na)) / y
   787       b(i,na) = t1
             b(i,en) = t2
-  790    continue
+        end do !790    continue
 !     .......... end complex vector ..........
   795    isw = 3 - isw
-  800 continue
+  end do !800 continue
 !     .......... end back substitution.
 !                transform to original coordinate system.
 !                for j=n step -1 until 1 do -- ..........
-      do 880 jj = 1, n
+do jj = 1, n !do 880
          j = n + 1 - jj
 !
-         do 880 i = 1, n
+do i = 1, n !do 880
             zz = 0.0d0
 !
-            do 860 k = 1, j
-  860       zz = zz + z(i,k) * b(k,j)
+do k = 1, j !do 860
+  zz = zz + z(i,k) * b(k,j)
+  end do 
 !
             z(i,j) = zz
-  880 continue
+        end do!880 continue
+    end do !880 continue
 !     .......... normalize so that modulus of largest
 !                component of each vector is 1.
 !                (isw is 1 initially from before) ..........
-      do 950 j = 1, n
+do j = 1, n !do 950
          d = 0.0d0
-         if (isw .eq. 2) go to 920
-         if (alfi(j) .ne. 0.0d0) go to 945
+         if (isw .eq. 2) goto 920
+         if (alfi(j) .ne. 0.0d0) goto 945
 !
-         do 890 i = 1, n
+do i = 1, n !do 890
             if (dabs(z(i,j)) .gt. d) d = dabs(z(i,j))
-  890    continue
+        end do !  890    continue
 !
-         do 900 i = 1, n
-  900    z(i,j) = z(i,j) / d
+do i = 1, n !do 900
+  z(i,j) = z(i,j) / d
+end do !900
 !
-         go to 950
+         cycle !goto 950
 !
-  920    do 930 i = 1, n
+920    do i = 1, n !do 930
             r = dabs(z(i,j-1)) + dabs(z(i,j))
-            if (r .ne. 0.0d0) r = r * dsqrt((z(i,j-1)/r)**2
-     x                                     +(z(i,j)/r)**2)
+            if (r .ne. 0.0d0) r = r * dsqrt((z(i,j-1)/r)**2 + (z(i,j)/r)**2)
             if (r .gt. d) d = r
-  930    continue
+        end do !930    continue
 !
-         do 940 i = 1, n
+do i = 1, n !do 940
             z(i,j-1) = z(i,j-1) / d
             z(i,j) = z(i,j) / d
-  940    continue
+            end do !940    continue
 !
   945    isw = 3 - isw
-  950 continue
+  end do !950 continue
 !
       return
       end
+
+
       subroutine rgg(nm,n,a,b,alfr,alfi,beta,matz,z,ierr)
 !
       integer n,nm,ierr,matz
-      real(kind(1d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
+      real(kind(1.0d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
       logical tf
 !
 !     this subroutine calls the recommended sequence of
@@ -1147,23 +1152,23 @@
 !
 !     ------------------------------------------------------------------
 !
-      if (n .le. nm) go to 10
+      if (n .le. nm) goto 10
       ierr = 10 * n
-      go to 50
+      goto 50
 !
-   10 if (matz .ne. 0) go to 20
+   10 if (matz .ne. 0) goto 20
 !     .......... find eigenvalues only ..........
       tf = .false.
       call  qzhes(nm,n,a,b,tf,z)
       call  qzit(nm,n,a,b,0.0d0,tf,z,ierr)
       call  qzval(nm,n,a,b,alfr,alfi,beta,tf,z)
-      go to 50
+      goto 50
 !     .......... find both eigenvalues and eigenvectors ..........
    20 tf = .true.
       call  qzhes(nm,n,a,b,tf,z)
       call  qzit(nm,n,a,b,0.0d0,tf,z,ierr)
       call  qzval(nm,n,a,b,alfr,alfi,beta,tf,z)
-      if (ierr .ne. 0) go to 50
+      if (ierr .ne. 0) goto 50
       call  qzvec(nm,n,a,b,alfr,alfi,beta,z)
    50 return
       end
