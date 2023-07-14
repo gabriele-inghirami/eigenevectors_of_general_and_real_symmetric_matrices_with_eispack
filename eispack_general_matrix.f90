@@ -17,6 +17,7 @@
 ! .....................................................................
 
       subroutine qzhes(nm,n,a,b,matz,z)
+      implicit none
 !
       integer i,j,k,l,n,lb,l1,nm,nk1,nm1,nm2
       real(kind(1.0d0)) a(nm,n),b(nm,n),z(nm,n)
@@ -77,7 +78,7 @@
     end if
 
 !     .......... reduce b to upper triangular form ..........
-    if (n .le. 1) goto 170
+    if (n .le. 1) return !goto 170
       nm1 = n - 1
 !
 do l = 1, nm1 !do 100
@@ -140,7 +141,7 @@ do i = l1, n !do 90
 end do !100 continue
 !     .......... reduce a to upper hessenberg form, while
 !                keeping b triangular ..........
-      if (n .eq. 2) goto 170
+      if (n .eq. 2) return !goto 170
       nm2 = n - 2
 !
 do k = 1, nm2 !do 160
@@ -208,10 +209,11 @@ end do !150    continue
 !
 end do !160 continue
 !
-  170 return
+!170 return
       end subroutine
 
       subroutine qzit(nm,n,a,b,eps1,matz,z,ierr)
+      implicit none
 !
       integer i,j,k,l,n,en,k1,k2,ld,ll,l1,na,nm,ish,itn,its,km1,lm1
       integer enm2,ierr,lor1,enorn
@@ -566,6 +568,7 @@ end do !260 continue
       end
 
       subroutine qzval(nm,n,a,b,alfr,alfi,beta,matz,z)
+      implicit none
 !
       integer i,j,n,en,na,nm,nn,isw
       real(kind(1.0d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
@@ -833,13 +836,14 @@ do j = na, n !do 470
          alfi(j) = an * t / r
          if (i .eq. 1) goto 502
   505    isw = 3 - isw
-  end do !510 continue
+end do !510 continue
       b(n,1) = epsb
 !
       return
       end
 
       subroutine qzvec(nm,n,a,b,alfr,alfi,beta,z)
+      implicit none
 !
       integer i,j,k,m,n,en,ii,jj,na,nm,nn,isw,enm2
       real(kind(1.0d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
@@ -944,7 +948,7 @@ do j = m, en !do 610
             t = w
             if (w .eq. 0.0d0) t = epsb
             b(i,en) = -r / t
-            cycle !goto 700
+            goto 700
 !     .......... real 2-by-2 block ..........
   640       x = betm * a(i,i+1) - alfm * b(i,i+1)
             y = betm * a(i+1,i)
@@ -956,7 +960,7 @@ do j = m, en !do 610
             goto 690
   650       b(i+1,en) = (-s - y * t) / zz
   690       isw = 3 - isw
-  end do !700    continue
+700  end do !700    continue
 !     .......... end real vector ..........
          cycle !goto 800
 !     .......... complex vector ..........
@@ -1010,15 +1014,21 @@ do j = m, en !do 760
             t1 = (tr + ti * rr) / d
             t2 = (ti - tr * rr) / d
             !goto (787,782), isw
-            if (isw .eq. 1) goto 787
-            if (isw .eq. 2) goto 782
+            if (isw .ne. 2) then
+                goto 787
+            else
+                goto 782
+            end if
   777       rr = dr / di
             d = dr * rr + di
             t1 = (tr * rr + ti) / d
             t2 = (ti * rr - tr) / d
             !goto (787,782), isw
-            if (isw .eq. 1) goto 787
-            if (isw .eq. 2) goto 782
+            if (isw .ne. 2) then
+                goto 787
+            else
+                goto 782
+            end if
 !     .......... complex 2-by-2 block ..........
   780       x = betm * a(i,i+1) - almr * b(i,i+1)
             x1 = -almi * b(i,i+1)
@@ -1040,10 +1050,10 @@ do j = m, en !do 760
             t2 = (-s - zz * b(i+1,en) - z1 * b(i+1,na)) / y
   787       b(i,na) = t1
             b(i,en) = t2
-        end do !790    continue
+       end do !790    continue
 !     .......... end complex vector ..........
   795    isw = 3 - isw
-  end do !800 continue
+end do !800 continue
 !     .......... end back substitution.
 !                transform to original coordinate system.
 !                for j=n step -1 until 1 do -- ..........
@@ -1076,7 +1086,7 @@ do i = 1, n !do 900
   z(i,j) = z(i,j) / d
 end do !900
 !
-         cycle !goto 950
+  cycle!       goto 950
 !
 920    do i = 1, n !do 930
             r = dabs(z(i,j-1)) + dabs(z(i,j))
@@ -1090,13 +1100,14 @@ do i = 1, n !do 940
             end do !940    continue
 !
   945    isw = 3 - isw
-  end do !950 continue
+ end do !950 continue
 !
       return
       end
 
 
       subroutine rgg(nm,n,a,b,alfr,alfi,beta,matz,z,ierr)
+      implicit none
 !
       integer n,nm,ierr,matz
       real(kind(1.0d0)) a(nm,n),b(nm,n),alfr(n),alfi(n),beta(n),z(nm,n)
