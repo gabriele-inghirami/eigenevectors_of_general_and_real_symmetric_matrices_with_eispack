@@ -1,5 +1,8 @@
 ! Code to test the mini library, extracted from EISPACK, composed by the source files:
 ! eispack_symm_matrix.f90 and eispack_general_matrix.f90.
+!
+! For an overview of what this example/test code does, please, read the file README.md.
+! 
 ! Author: Gabriele Inghirami ( gabriele.inghirami a.  gmail.com)
 ! License: PUBLIC DOMAIN
 

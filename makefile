@@ -10,7 +10,7 @@ OBJECT_EXEC_FILE = $(SOURCE_EXEC_FILE:.f90=.o)
 
 # Names of the targets
 LIB_TARGET = eispack.a
-EXE_TARGET = test.exe
+EXE_TARGET = test_eispack.exe
 
 # Symbolic targets not associated with files, but with actions
 .PHONY: all clean
