@@ -33,6 +33,12 @@ make
 You will get a static library file `eispack.a` and an executable `test.exe`
 with the sample test program.
 
+To clean the directory with the sources type:
+
+```
+make clean
+```
+
 To compile a f90 program named "my_program.f90" tpye:
 
 ```
