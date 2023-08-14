@@ -121,7 +121,6 @@ program test
     write(*,*) NEW_LINE('a')//"Test 3"//NEW_LINE('a')
     write(*,*) "Testing generalized eigenvalues and eigenvectors solver (fot the eq. A . x = lambda B . x) with A and B:"
     ! values are inserted in the matrix in the order a11, a21, a31, ..., an1, a12, a22, a32,...
-    a = reshape((/3d0,2d0,-1d0,6d0,2d0,0.5d0,0.4d0,1.7d0,-1d0,0.4d0,1.9d0,4.1d0,6d0,1.7d0,4.1d0,1.5d0/),shape(a))
     a = reshape((/1.1d0,0.23d0,0.68d0,0.295d0,0.2d0,-0.14d0,0.39d0,0.56d0,0.7d0,0.41d0,1.03d0,0.91d0,&
         0.34d0,0.51d0,0.87d0,1.6d0/),shape(a))
     b = reshape((/1.d0,0d0,0d0,0d0,0d0,1.d0,0d0,0d0,0d0,0d0,1.d0,0d0,0d0,0d0,0d0,1.d0/),shape(b))
@@ -153,7 +152,6 @@ program test
     write(*,*) NEW_LINE('a')//"Test 4"//NEW_LINE('a')
     write(*,*) "Testing generalized eigenvalues and eigenvectors solver for the eq. ( A . x = lambda B . x ) with A and B:"
     ! values are inserted in the matrix in the order a11, a21, a31, ..., an1, a12, a22, a32,...
-    a = reshape((/3d0,2d0,-1d0,6d0,2d0,0.5d0,0.4d0,1.7d0,-1d0,0.4d0,1.9d0,4.1d0,6d0,1.7d0,4.1d0,1.5d0/),shape(a))
     a = reshape((/3.2d0,0.1d0,0.4d0,0.5d0,0.13d0,-0.25d0,0.22d0,0.91d0,0.38d0,0.21d0,0.2d0,0.08d0,&
         0.47d0,0.9d0,0.1d0,1.4d0/),shape(a))
     b = reshape((/1.d0,0d0,0d0,0d0,0d0,1.d0,0d0,0d0,0d0,0d0,1.d0,0d0,0d0,0d0,0d0,1.d0/),shape(b))
@@ -183,9 +181,8 @@ program test
     end do
 
     write(*,*) NEW_LINE('a')//"Test 5"//NEW_LINE('a')
-    write(*,*) "Testing generalized eigenvalues and eigenvectors solver (fot the eq. A . x = lambda B . x) with A and B:"
+    write(*,*) "Testing generalized eigenvalues and eigenvectors solver (for the eq. A . x = lambda B . x) with A and B:"
     ! values are inserted in the matrix in the order a11, a21, a31, ..., an1, a12, a22, a32,...
-    a = reshape((/3d0,2d0,-1d0,6d0,2d0,0.5d0,0.4d0,1.7d0,-1d0,0.4d0,1.9d0,4.1d0,6d0,1.7d0,4.1d0,1.5d0/),shape(a))
     a = reshape((/-5d0,1d0,-1.5d0,2.7d0,1d0,2d0,4.7d0,5.1d0,-1d0,4d0,0.4d0,3.3d0,2.6d0,1.1d0,0.5d0,-1d0/),shape(a))
     b = reshape((/1.2d0,0.11d0,0.05d0,0.03d0,0.1d0,0.95d0,0.09d0,0.08d0,0.2d0,0.25d0,1.15d0,0.075d0,&
                   0.15d0,0.12d0,0.14d0,1.05d0/),shape(b))
