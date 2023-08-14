@@ -75,7 +75,7 @@ program test
     implicit none
     integer, parameter :: n = 4
     integer :: i, j, ierr
-    real(kind(1.0d0)) :: lambda
+    real(kind(1.0d0)) :: lambda, norm_factor
     real(kind(1.0d0)), dimension(n) :: w, fv1, fv2, alfr, alfi, beta, res_left, res_right, res_final, vec
     real(kind(1.0d0)), dimension(n,n) :: a, b, z, a_copy, b_copy
 
@@ -210,6 +210,53 @@ program test
         res_final = res_left - lambda * res_right
         write(*,*) i," : ", maxval(abs(res_final))
     end do
+    write(*,*) ""
+
+    write(*,*) NEW_LINE('a')//"Test 6"//NEW_LINE('a')
+    ! this is a test with a Minkoswki metric matrix
+    write(*,*) "Testing generalized eigenvalues and eigenvectors solver (for the eq. A . x = lambda B . x) with A and B:"
+    ! values are inserted in the matrix in the order a11, a21, a31, ..., an1, a12, a22, a32,...
+    a = reshape((/3.77552,-0.0789811,0.00825485,3.70686,-0.0789811,0.0170986,-0.00262697,-0.0894072,0.00825485,&
+        -0.00262697,0.00601099,0.0132516,3.70686,-0.0894072,0.0132516,3.6821/),shape(a))
+    b = reshape((/1d0,0d0,0d0,0d0,0d0,-1d0,0d0,0d0,0d0,0d0,-1d0,0d0,0d0,0d0,0d0,-1d0/),shape(b))
+    ! we make copies that will be used at the end to check the results because the original matrices will be modified
+    a_copy = a
+    b_copy = b
+    call display_square_matrix(n, b)
+    call display_square_matrix(n, a)
+    call rgg(n, n, a, b, alfr, alfi, beta, 1, z, ierr)
+    if (ierr .ne. 0) then
+        write(*,*) "Error in Eispack subroutine rgg\n"
+        call exit(1)
+    end if
+    write(*,*) "Solution:"
+    ! warning: here we display the solution assuming that the values are all real
+    call display_eigenvalues_and_eigenvectors(n, alfr/beta, z)
+    call print_generalised_case_check_message
+    do i = 1, n
+        do j = 1, n
+            vec(j) = z(j,i)
+        end do 
+        lambda = alfr(i)/beta(i)
+        call square_matrix_vector_dot_product(a_copy, vec, n, res_left)
+        call square_matrix_vector_dot_product(b_copy, vec, n, res_right)
+        res_final = res_left - lambda * res_right
+        write(*,*) i," : ", maxval(abs(res_final))
+    end do
+    write(*,*) ""
+    write(*,*) "Now normalizing the eigenvector of the highest eigenvalue as a four velocity:"
+    do j = 1, n
+        vec(j) = z(j,1)
+    end do
+    ! we want the first component of the four velocity to be positive
+    if (vec(1) .lt. 0) then
+        vec = -vec
+    end if
+    norm_factor = sqrt(vec(1)**2 - vec(2)**2 - vec(3)**2 - vec(4)**2)
+    vec = vec / norm_factor
+    write(*,*) ""
+    write(*,"(4f12.6)",advance="no") (vec(j), j = 1, n)
+    write(*,*) ""
     write(*,*) ""
 
 end program
