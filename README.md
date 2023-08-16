@@ -68,7 +68,7 @@ The rgg solver is more generic, but a bit slower and one must be prepared to han
 (the output fields are different depending on whether the results are real or complex number,
 see the documentation of the subroutine in the comments of the code).
 
-The source code of test_eispack.f90 provides an example of how to use the library, while the execution
+The source code of test_eispack.f90 provides a few examples of how to use the library, while the execution
 of the executable serves also as a test, because we verify that the solutions lambda and x satisfy
 
 $ A . x - \lambda x = 0 $ and $ A . x - \lambda B . x = 0 $
@@ -76,4 +76,4 @@ $ A . x - \lambda x = 0 $ and $ A . x - \lambda B . x = 0 $
 by selecting, for each eigenvector, the biggest absolute value of the LHS of the expressions above and
 displying it. If the library works fine, the results must be very small (~ < 10^-14) numbers.
 Please, note that, in case of wrong results, no warning in printed, one has always to check the output.
-Please, also note that currently no example of complex eigenumber/eigenvector is given.
+Please, also note that currently no example of complex eigenvalue/eigenvector is given.
